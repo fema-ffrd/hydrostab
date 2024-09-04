@@ -2,7 +2,10 @@
 
 import numpy as np
 
-from hydrostab import metrics
+from hydrostab import metrics, fft
+
+
+__all__ = ["stable", "metrics", "fft"]
 
 
 def stable(flow: np.ndarray) -> bool:
