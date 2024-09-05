@@ -21,3 +21,19 @@ def test_unstable():
         hydrograph = pd.read_csv(csv)
         flows = hydrograph["flow"].values
         assert hydrostab.stable(flows) is False
+
+
+def test_fft_stable():
+    for csv in STABLE_HYDROGRAPHS:
+        hydrograph = pd.read_csv(csv)
+        flows = hydrograph["flow"].values
+        is_stable, _, _, _ = hydrostab.fft_stable(flows)
+        assert is_stable is True
+
+
+def test_fft_unstable():
+    for csv in UNSTABLE_HYDROGRAPHS:
+        hydrograph = pd.read_csv(csv)
+        flows = hydrograph["flow"].values
+        is_stable, _, _, _ = hydrostab.fft_stable(flows)
+        assert is_stable is False
