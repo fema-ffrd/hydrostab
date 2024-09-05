@@ -33,23 +33,31 @@ HYDROGRAPHS = Path("../tests/data/hydrographs")
 
 ```python
 def check_fft(csv_path: Path, sampling_rate: float = 1.0, threshold_period: float = 10.0, high_freq_threshold: float = 0.2):
-    df = pd.read_csv(csv_path, parse_dates=True)
+    df = pd.read_csv(csv_path)
+    df["time"] = pd.to_datetime(df["time"])
+    time_diffs = df["time"].diff()
+    time_diff = time_diffs.min()
+    max_time_diff = time_diffs.max()
+    if max_time_diff != time_diff:
+        print(f"Timestep range: {time_diff} - {max_time_diff}")
+        raise Exception("FFT requires a regular time series.")
+    print(f"Timestep: {time_diff}")    
+    
     is_stable, high_freq_proportion, power_spectrum, freqs = hydrostab.fft.fft_stable(df["flow"], threshold_period=threshold_period)
 
     fig, axes = plt.subplots(nrows=1, ncols=2, figsize=(15, 5))
 
     category = "Unstable" if "unstable" in str(csv_path) else "Stable"
-    
     print(f"Stable: {is_stable} {'✅' if is_stable else '❌'}")
     print(f"Threshold period: {threshold_period}")
     print(f"High freq proportion: {high_freq_proportion}")
-    
-    df.plot(x="time", ax=axes[0], title=f"Hydrograph - {str(csv_path.name)} ({category})", rot=90)
+
+    # Plot hydrograph
+    df.plot(x="time", ax=axes[0], title=f"Hydrograph - {str(csv_path.name)} ({category})", marker=".")
     axes[0].set_xlabel("Time")
     axes[0].set_ylabel("Flow")
-    
-    #plt.figure()
-    # axes[1] = axes[1]
+
+    # Plot power spectrum
     axes[1].plot(freqs, power_spectrum)
     axes[1].set_title("Hydrograph Power Spectrum")
     axes[1].set_xlabel("Frequency")
@@ -140,4 +148,8 @@ def on_analyze_clicked(b):
 btn_analyze.on_click(on_analyze_clicked)
 
 display(select_hydrograph, input_sampling_rate, input_threshold_period, input_high_freq_threshold, btn_analyze, output)
+```
+
+```python
+
 ```
