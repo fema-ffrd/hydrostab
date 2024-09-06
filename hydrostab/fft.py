@@ -18,10 +18,11 @@ def fft_stable(
     hydrograph : np.ndarray
         Time series hydrograph data.
     sampling_rate: float, optional
-        Sampling rate of the hydrograph data. i.e., time between each data
+        Sampling rate of the hydrograph data. i.e., the time between each data
         point.
     threshold_period : float, optional
-        Time period for unstable frequencies. Must be in the same units as
+        Time period for unstable frequencies. Oscillations happening faster
+        than this are considered problematic. Must be in the same units as
         the sampling rate.
     high_freq_threshold : float, optional
         Threshold for identifying high frequencies. If the proportion
