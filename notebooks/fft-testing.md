@@ -32,7 +32,9 @@ HYDROGRAPHS = Path("../tests/data/hydrographs")
 ```
 
 ```python
-def check_fft(csv_path: Path, sampling_rate: float = 1.0, threshold_period: float = 10.0, high_freq_threshold: float = 0.2):
+import warnings
+
+def check_fft(csv_path: Path, sampling_rate: float = 1.0, unstable_period: float = 10.0, threshold: float = 0.2):
     df = pd.read_csv(csv_path)
     df["time"] = pd.to_datetime(df["time"])
     time_diffs = df["time"].diff()
@@ -40,17 +42,24 @@ def check_fft(csv_path: Path, sampling_rate: float = 1.0, threshold_period: floa
     max_time_diff = time_diffs.max()
     if max_time_diff != time_diff:
         print(f"Timestep range: {time_diff} - {max_time_diff}")
-        raise Exception("FFT requires a regular time series.")
+        warnings.warn("FFT requires a regular time series.")
     print(f"Timestep: {time_diff}")    
     
-    is_stable, high_freq_proportion, power_spectrum, freqs = hydrostab.fft.fft_stable(df["flow"], threshold_period=threshold_period)
+    is_stable, unstable_proportion, power_spectrum, freqs = hydrostab.fft.fft_stable(df["flow"],
+                                                                                     sampling_rate=sampling_rate,
+                                                                                     unstable_period=unstable_period,
+                                                                                     threshold=threshold,
+                                                                                     normalize=True,
+                                                                                     relative=False,
+                                                                                    )
 
     fig, axes = plt.subplots(nrows=1, ncols=2, figsize=(15, 5))
 
     category = "Unstable" if "unstable" in str(csv_path) else "Stable"
     print(f"Stable: {is_stable} {'✅' if is_stable else '❌'}")
-    print(f"Threshold period: {threshold_period}")
-    print(f"High freq proportion: {high_freq_proportion}")
+    print(f"Unstable period: {unstable_period}")
+    print(f"Threshold: {threshold}")
+    print(f"Unstable proportion: {unstable_proportion}")
 
     # Plot hydrograph
     df.plot(x="time", ax=axes[0], title=f"Hydrograph - {str(csv_path.name)} ({category})", marker=".")
@@ -58,12 +67,13 @@ def check_fft(csv_path: Path, sampling_rate: float = 1.0, threshold_period: floa
     axes[0].set_ylabel("Flow")
 
     # Plot power spectrum
-    axes[1].plot(freqs, power_spectrum)
+    axes[1].plot(1/freqs, power_spectrum)
     axes[1].set_title("Hydrograph Power Spectrum")
-    axes[1].set_xlabel("Frequency")
+    axes[1].set_xlabel("Period")
     axes[1].set_ylabel("Power")
+    axes[1].set_xscale("log")
     axes[1].set_yscale("log")
-    axes[1].axvline(x=1/threshold_period, color="r", linestyle="--", label="High-frequency threshold")
+    axes[1].axvline(x=unstable_period, color="r", linestyle="--", label="Unstable period")
 
     return fig, axes
 ```
@@ -97,12 +107,12 @@ input_sampling_rate = widgets.FloatText(
 )
 # display(input_sampling_rate)
 
-input_threshold_period = widgets.FloatSlider(
+input_unstable_period = widgets.FloatSlider(
     value=10.0,
     min=0.0,
     max=50.0,
     step=0.1,
-    description='Threshold period:',
+    description='Unstable period:',
     disabled=False,
     continuous_update=False,
     orientation='horizontal',
@@ -111,12 +121,12 @@ input_threshold_period = widgets.FloatSlider(
 )
 # display(input_threshold_period)
 
-input_high_freq_threshold = widgets.FloatSlider(
+input_threshold = widgets.FloatSlider(
     value=0.2,
     min=0.0,
     max=1.0,
     step=0.01,
-    description='High freq threshold:',
+    description='Threshold:',
     disabled=False,
     continuous_update=False,
     orientation='horizontal',
@@ -140,14 +150,18 @@ def on_analyze_clicked(b):
         output.clear_output()
         hydrograph_csv_path = select_hydrograph.value
         sampling_rate = input_sampling_rate.value
-        threshold_period = input_threshold_period.value
-        high_freq_threshold = input_high_freq_threshold.value
-        fig, ax = check_fft(hydrograph_csv_path, sampling_rate=sampling_rate, threshold_period=threshold_period)
+        unstable_period = input_unstable_period.value
+        threshold = input_threshold.value
+        fig, ax = check_fft(hydrograph_csv_path, sampling_rate=sampling_rate, unstable_period=unstable_period, threshold=threshold)
         display(fig)
 
 btn_analyze.on_click(on_analyze_clicked)
 
 display(select_hydrograph, input_sampling_rate, input_threshold_period, input_high_freq_threshold, btn_analyze, output)
+```
+
+```python
+
 ```
 
 ```python
