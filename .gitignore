@@ -1,5 +1,8 @@
 venv*
 
+# use jupytext to convert notebooks to scripts
+*.ipynb
+
 # Created by https://www.toptal.com/developers/gitignore/api/python,vim,linux,windows
 # Edit at https://www.toptal.com/developers/gitignore?templates=python,vim,linux,windows
 

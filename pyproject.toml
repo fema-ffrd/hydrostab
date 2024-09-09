@@ -17,6 +17,7 @@ dependencies = ["pandas", "scipy"]
 
 [project.optional-dependencies]
 dev = ["pre-commit", "ruff", "pytest", "pytest-cov"]
+nb = ["jupyterlab", "jupytext", "ipywidgets", "matplotlib", "rashdf"]
 # docs = ["sphinx", "numpydoc", "sphinx_rtd_theme"]
 
 [project.urls]
@@ -32,9 +33,12 @@ testpaths = "tests"
 [tool.ruff.lint]
 select = ["D"]
 
-# [tool.ruff.lint.pydocstyle]
-# convention = "numpy"
+[tool.ruff.lint.pydocstyle]
+convention = "numpy"
 
 [tool.ruff.lint.per-file-ignores]
 "tests/**" = ["D"]
 "docs/**" = ["D"]
+
+[tool.setuptools]
+packages = ["hydrostab"]
