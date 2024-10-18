@@ -17,32 +17,32 @@ oscillation_thresholds = {
 std_dev_thresholds = {
     5.0: "Stable",
     10.0: "Somewhat Stable",
-    15.0: "Somewhat Unstable",
-    20.0: "Unstable"
+    25.0: "Somewhat Unstable",
+    50.0: "Unstable"
 }
 
-
-
-import pandas as pd
-import numpy as np
-
-def calculate_oscillation_fraction(file_path, rate_of_change_threshold, time_interval_minutes):
+def calculate_oscillation_fraction(file_path, rate_of_change_threshold):
     """
     Calculate the oscillation fraction from the hydrograph data.
 
     Parameters:
     file_path (str): The path to the CSV file containing the hydrograph data.
     rate_of_change_threshold (float): The threshold for the rate of change to consider an oscillation.
-    time_interval_minutes (float): The time interval between data points in minutes.
 
     Returns:
-    tuple: A tuple containing the oscillation fraction, flow data, rate of change percentage, time data, and standard deviation.
+    tuple: A tuple containing the oscillation fraction, flow data, rate of change percentage, time data, standard deviation, and inferred time interval in minutes.
     """
     # Read the CSV file
     data = pd.read_csv(file_path)
     
+    # Ensure you are working with a copy of the DataFrame slice
+    data = data.copy()
+    
+    # Convert time data to datetime, inferring the format
+    data['time'] = pd.to_datetime(data['time'], infer_datetime_format=True, errors='coerce')
+    
     # Assuming the hydrograph data is in columns named 'time' and 'flow'
-    time_data = pd.to_datetime(data['time'])  # Convert time data to datetime
+    time_data = data['time']
     flow_data = data['flow']
     
     # Convert negative values in flow_data to 0
@@ -53,6 +53,10 @@ def calculate_oscillation_fraction(file_path, rate_of_change_threshold, time_int
     
     # Use 10% of the mean value as epsilon
     epsilon = 0.1 * mean_flow
+    
+    # Infer the time interval in minutes
+    time_diffs = time_data.diff().dropna()
+    time_interval_minutes = time_diffs.mode().iloc[0].total_seconds() / 60
     
     # Convert time interval from minutes to hours
     time_interval_hour = time_interval_minutes / 60
@@ -77,9 +81,9 @@ def calculate_oscillation_fraction(file_path, rate_of_change_threshold, time_int
     # Calculate the standard deviation of the rate of change percentage
     std_dev_rate_of_change = np.std(rate_of_change_percentage)
 
-    return oscillation_fraction, flow_data, rate_of_change_percentage, time_data, std_dev_rate_of_change
+    return oscillation_fraction, flow_data, rate_of_change_percentage, time_data, std_dev_rate_of_change, time_interval_minutes
 
-def plot_hydrograph(file_path, rate_of_change_threshold, oscillation_fraction, flow_data, rate_of_change_percentage, time_data, std_dev_rate_of_change):
+def plot_hydrograph(file_path, rate_of_change_threshold, oscillation_fraction, flow_data, rate_of_change_percentage, time_data, std_dev_rate_of_change, time_interval_minutes):
     """
     Plot the hydrograph and the rate of change.
 
@@ -91,6 +95,7 @@ def plot_hydrograph(file_path, rate_of_change_threshold, oscillation_fraction, f
     rate_of_change_percentage (np.ndarray): The rate of change percentage.
     time_data (pd.Series): The time data from the hydrograph.
     std_dev_rate_of_change (float): The standard deviation of the rate of change percentage.
+    time_interval_minutes (float): The inferred time interval between data points in minutes.
     """
     print("Oscillation Threshold Table:")
     print("----------------------------")
@@ -127,7 +132,6 @@ def plot_hydrograph(file_path, rate_of_change_threshold, oscillation_fraction, f
             std_dev_label = class_label
             break
 
-
     # Plot the original hydrograph and the rate of change
     fig, ax1 = plt.subplots(figsize=(10, 4))  # Shrink the plot vertically
     
@@ -157,13 +161,14 @@ def plot_hydrograph(file_path, rate_of_change_threshold, oscillation_fraction, f
     fig.suptitle(f'Hydrograph Analysis - {file_name}', y=0.99)  # Adjust the y position of the title
 
     # Add the percentage of oscillations outside of the stability threshold
-    plt.figtext(0.5, 0.90, f'Percentage of time adjusted oscillations outside of the stability threshold: {oscillation_fraction * 100:.2f}% - {oscillation_label}', ha='center', fontsize=10, color='black')
+    plt.figtext(0.5, 0.90, f'Time adjusted oscillations ({time_interval_minutes:.0f} min), exceeding stability threshold: {oscillation_fraction * 100:.2f}% - {oscillation_label}', ha='center', fontsize=10, color='black')
     plt.figtext(0.5, 0.86, f'Standard deviation of rate of change: {std_dev_rate_of_change:.2f} - {std_dev_label}', ha='center', fontsize=10, color='black')
+    #plt.figtext(0.5, 0.82, f'Inferred time interval: {time_interval_minutes:.2f} minutes', ha='center', fontsize=10, color='black')
 
     fig.legend(loc='lower center', ncol=2)  # Place the legend horizontally at the bottom
     plt.show()
 
-def analyze_and_plot_hydrograph(file_path, rate_of_change_threshold, time_interval_minutes):
+def analyze_and_plot_hydrograph(file_path, rate_of_change_threshold):
     """
     Analyze the hydrograph data and plot the results.
 
@@ -173,27 +178,18 @@ def analyze_and_plot_hydrograph(file_path, rate_of_change_threshold, time_interv
     Parameters:
     file_path (str): The path to the CSV file containing the hydrograph data.
     rate_of_change_threshold (float): The threshold for the rate of change to consider an oscillation.
-    time_interval_minutes (float): The time interval between data points in minutes.
     """
     # Calculate oscillation fraction
-    oscillation_fraction, flow_data, rate_of_change_percentage, time_data, std_dev_rate_of_change = calculate_oscillation_fraction(file_path, rate_of_change_threshold, time_interval_minutes)
+    oscillation_fraction, flow_data, rate_of_change_percentage, time_data, std_dev_rate_of_change, time_interval_minutes = calculate_oscillation_fraction(file_path, rate_of_change_threshold)
     
     # Plot hydrograph
-    plot_hydrograph(file_path, rate_of_change_threshold, oscillation_fraction, flow_data, rate_of_change_percentage, time_data, std_dev_rate_of_change)
+    plot_hydrograph(file_path, rate_of_change_threshold, oscillation_fraction, flow_data, rate_of_change_percentage, time_data, std_dev_rate_of_change, time_interval_minutes)
 
 if __name__ == "__main__":
     # Example usage
-    #file_path = r"tests\data\hydrographs\stable\ElkMiddle_Queen Shoals Gage.csv"
-    #file_path = r"tests\data\hydrographs\unstable\ElkMiddle_DS-Sutton-Gage.csv"
-    #file_path = r"tests\data\hydrographs\unstable\ElkMiddle_DS-Sutton-Gage_15min.csv"
-    #file_path = r"tests\data\hydrographs\stable\Denton_Nov15_RC_Outlet.csv"
-    file_path = r"tests\data\hydrographs\stable\Denton_Dec91_RC_Outlet.csv"
-    #file_path = r"tests\data\hydrographs\unstable\Denton_Aug2017_1.csv"
-    #file_path = r"tests\data\hydrographs\unstable\Denton_Aug2017_2.csv"
-    #file_path = r"tests\data\hydrographs\unstable\Denton_Aug2017_3.csv"
+    file_path = r"5- Stable with quick ramp-up.csv"
     
     rate_of_change_threshold = 0.25  # Example threshold
-    time_interval_minutes = 15  # Example time interval in minutes
     
     # Analyze and plot hydrograph
-    analyze_and_plot_hydrograph(file_path, rate_of_change_threshold, time_interval_minutes)
+    analyze_and_plot_hydrograph(file_path, rate_of_change_threshold)
