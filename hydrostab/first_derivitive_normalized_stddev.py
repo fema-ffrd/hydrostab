@@ -170,7 +170,7 @@ def plot_hydrograph(file_path, rate_of_change_threshold, oscillation_fraction, f
 
 def analyze_and_plot_hydrograph(file_path, rate_of_change_threshold):
     """
-    Analyze the hydrograph data and plot the results.
+    Analyze the hydrograph data and plot the results
 
     This function calculates the oscillation fraction and plots the hydrograph
     along with the rate of change.
