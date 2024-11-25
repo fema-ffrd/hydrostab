@@ -26,7 +26,7 @@ def plot_point_change(flow: np.ndarray, abrupt_changes: np.ndarray):
     plt.show()
     
 def find_first_peak(flow: np.ndarray):
-       """
+    """
     Find the first peak data point in a data array.
     
     Parameters:
