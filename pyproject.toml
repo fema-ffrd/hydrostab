@@ -17,6 +17,7 @@ dependencies = ["pandas", "scipy"]
 
 [project.optional-dependencies]
 dev = ["pre-commit", "ruff", "pytest", "pytest-cov"]
+ras = ["rashdf"]
 nb = ["jupyterlab", "jupytext", "ipywidgets", "matplotlib", "rashdf"]
 # docs = ["sphinx", "numpydoc", "sphinx_rtd_theme"]
 
