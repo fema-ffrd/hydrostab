@@ -1,4 +1,5 @@
 import pandas as pd
+import pytest
 
 from pathlib import Path
 
@@ -13,31 +14,15 @@ def test_stable():
     for csv in STABLE_HYDROGRAPHS:
         print(csv)
         hydrograph = pd.read_csv(csv)
-        flows = hydrograph["flow"].values
-        assert hydrostab.stable(flows) is True
+        flows = hydrograph["flow"]
+        is_stable, _ = hydrostab.stability(flows)
+        assert bool(is_stable) is True
 
 
 def test_unstable():
     for csv in UNSTABLE_HYDROGRAPHS:
         print(csv)
         hydrograph = pd.read_csv(csv)
-        flows = hydrograph["flow"].values
-        assert hydrostab.stable(flows) is False
-
-
-def test_fft_stable():
-    for csv in STABLE_HYDROGRAPHS:
-        print(csv)
-        hydrograph = pd.read_csv(csv)
-        flows = hydrograph["flow"].values
-        is_stable, _, _, _ = hydrostab.fft.fft_stable(flows)
-        assert is_stable is True
-
-
-def test_fft_unstable():
-    for csv in UNSTABLE_HYDROGRAPHS:
-        print(csv)
-        hydrograph = pd.read_csv(csv)
-        flows = hydrograph["flow"].values
-        is_stable, _, _, _ = hydrostab.fft.fft_stable(flows)
-        assert is_stable is False
+        flows = hydrograph["flow"]
+        is_stable, _ = hydrostab.stability(flows)
+        assert bool(is_stable) is False

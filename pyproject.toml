@@ -1,6 +1,6 @@
 [project]
 name = "hydrostab"
-description = "Evaluation of hydrodynamic model stability."
+description = "Evaluation of hydrograph stability, detecting oscillations hydrodynamic models."
 readme = "README.md"
 classifiers = [
     "Development Status :: 4 - Beta",
@@ -13,18 +13,17 @@ classifiers = [
     "Programming Language :: Python :: 3.12",
 ]
 version = "0.1.0"
-dependencies = ["pandas", "scipy"]
+dependencies = ["pandas"]
 
 [project.optional-dependencies]
+ras = ["rashdf"]
+exp = ["scipy"]
 dev = ["pre-commit", "ruff", "pytest", "pytest-cov"]
 nb = ["jupyterlab", "jupytext", "ipywidgets", "matplotlib", "rashdf"]
 # docs = ["sphinx", "numpydoc", "sphinx_rtd_theme"]
 
 [project.urls]
 repository = "https://github.com/fema-ffrd/hydrostab"
-
-# [project.scripts]
-# rashdf = "cli:main"
 
 [tool.pytest.ini_options]
 pythonpath = "."
