@@ -22,7 +22,7 @@ def stability_score(
 
     Parameters
     ----------
-    hydrograph : np.ndarray
+    hydrograph : npt.NDArray[np.float64]
         1D array of hydrograph data (flow or stage)
     range_threshold : float, optional
         If the range of values in the hydrograph is less than this threshold,
@@ -33,6 +33,11 @@ def stability_score(
     float
         Stability score between 0.0 and 1.0, where 0.0 indicates perfect stability
         and higher values indicate more instability
+
+    Raises
+    ------
+    ValueError
+        If input array has less than 2 points or contains NaN/infinite values
     """
     hyd = coerce_array(hydrograph)
 
@@ -67,14 +72,23 @@ def is_stable(
 
     Parameters
     ----------
-    hydrograph : np.ndarray
-        Time series hydrograph values.
+    hydrograph : npt.NDArray[np.float64]
+        Time series hydrograph values
+    unstable_threshold : float, optional
+        Threshold above which a stability score indicates instability, by default 0.002
+    range_threshold : float, optional
+        If the range of values in the hydrograph is less than this threshold,
+        return a score of 0.0, by default 0.1
 
     Returns
     -------
     bool
-        True if the time series is stable, False otherwise.
+        True if the time series is stable, False otherwise
 
+    Raises
+    ------
+    ValueError
+        If input array has less than 2 points or contains NaN/infinite values
     """
     score = stability_score(hydrograph, range_threshold)
     return score < unstable_threshold
@@ -85,28 +99,29 @@ def stability(
     unstable_threshold: float = 0.002,
     range_threshold: float = 0.1,
 ) -> Tuple[bool, float]:
-    """
-    Classify a hydrograph as stable or unstable based on slope sign changes.
+    """Classify a hydrograph as stable or unstable based on slope sign changes.
 
     Parameters
     ----------
-    hydrograph : np.ndarray
-        1D array of hydrograph data (flow or stage).
-    score_threshold : float
-        Threshold for the score to classify stability. If the
-        score is less than this threshold, the hydrograph is
-        considered stable.
-    range_threshold : float
-        If `np.ptp(hydrograph)` is less than `range_threshold`,
-        then the hydrograph is considered stable with a
-        score of 0.0.
+    hydrograph : npt.NDArray[np.float64]
+        1D array of hydrograph data (flow or stage)
+    unstable_threshold : float, optional
+        Threshold above which a stability score indicates instability, by default 0.002
+    range_threshold : float, optional
+        If the range of values in the hydrograph is less than this threshold,
+        return a score of 0.0, by default 0.1
 
     Returns
     -------
     is_stable : bool
-        True if the hydrograph is classified as stable, False otherwise.
+        True if the hydrograph is classified as stable, False otherwise
     score : float
-        Stability score based on slope sign changes.
+        Stability score based on slope sign changes
+
+    Raises
+    ------
+    ValueError
+        If input array has less than 2 points or contains NaN/infinite values
     """
     score = stability_score(hydrograph, range_threshold)
     return score < unstable_threshold, score

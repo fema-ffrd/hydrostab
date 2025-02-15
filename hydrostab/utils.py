@@ -16,7 +16,23 @@ def coerce_array(array: npt.ArrayLike) -> npt.NDArray[np.float64]:
 
 
 def coerce_dt_array(dt_array: npt.ArrayLike) -> pd.Series[pd.Timestamp]:
-    """Coerce 1D array of input datetime values to pandas datetime."""
+    """Coerce 1D array of input datetime values to pandas datetime.
+    
+    Parameters
+    ----------
+    dt_array : npt.ArrayLike
+        Input array of datetime-like values
+        
+    Returns
+    -------
+    pd.Series[pd.Timestamp]
+        Series of pandas Timestamps
+        
+    Raises
+    ------
+    ValueError
+        If input is not 1D
+    """
     dt_array = np.asarray(dt_array)  # Convert to NumPy array
     if dt_array.ndim != 1:
         raise ValueError("Input must be 1D")
@@ -32,18 +48,18 @@ def coerce_array(arr: npt.ArrayLike) -> npt.NDArray[np.float64]:
     
     Parameters
     ----------
-    arr : array-like
+    arr : npt.ArrayLike
         Input array to validate
         
     Returns
     -------
-    np.ndarray
+    npt.NDArray[np.float64]
         Validated numpy array
         
     Raises
     ------
     ValueError
-        If array has less than 2 points or contains invalid values
+        If array has less than 2 points or contains NaN/infinite values
     """
     arr = np.asarray(arr, dtype=np.float64)
     

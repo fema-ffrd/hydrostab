@@ -10,7 +10,18 @@ import hydrostab
 
 
 def _reformat_var_name(var_name: str) -> str:
-    """Reformat variable name for Pandas DataFrame."""
+    """Reformat variable name for Pandas DataFrame.
+    
+    Parameters
+    ----------
+    var_name : str
+        Variable name to reformat
+        
+    Returns
+    -------
+    str
+        Reformatted variable name in lowercase with spaces replaced by underscores
+    """
     return var_name.lower().replace(" ", "_")
 
 
