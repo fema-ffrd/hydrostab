@@ -3,8 +3,8 @@ A Python package for analyzing the numerical stability of hydrograph time series
 Intended to be used with hydrographs from hydrodynamic models, such as
 [HEC-RAS](https://www.hec.usace.army.mil/software/hec-ras/).
 
-![stable](docs/stable.png "Stable")
-![unstable](docs/unstable.png "Unstable")
+![stable](https://raw.githubusercontent.com/fema-ffrd/hydrostab/main/docs/stable.png "Stable")
+![unstable](https://raw.githubusercontent.com/fema-ffrd/hydrostab/main/docs/unstable.png "Unstable")
 
 More examples: [notebooks/stability-examples.ipynb](notebooks/stability-examples.ipynb)
 
