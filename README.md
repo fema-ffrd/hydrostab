@@ -7,11 +7,6 @@ A Python package for analyzing the numerical stability of hydrograph time series
 Intended to be used with hydrographs from hydrodynamic models, such as
 [HEC-RAS](https://www.hec.usace.army.mil/software/hec-ras/).
 
-![stable](https://raw.githubusercontent.com/fema-ffrd/hydrostab/main/docs/stable.png "Stable")
-![unstable](https://raw.githubusercontent.com/fema-ffrd/hydrostab/main/docs/unstable.png "Unstable")
-
-More examples: [notebooks/stability-examples.ipynb](notebooks/stability-examples.ipynb)
-
 ## Installation
 
 To install from PyPI:
@@ -31,18 +26,28 @@ pip install "hydrostab[exp]"
 
 ## Methods
 
-### Slope Change Aggregation
-The default and recommended method for stability analysis. This method:
-1. Normalizes the hydrograph to a 0-1 range
-2. Computes differences between consecutive points (assumes constant timestep)
-3. Detects sign changes in the differences (slope reversals)
+### Slope Change
+The default and recommended method for stability analysis. This method can be used with flow,
+depth, or water surface elevation. It is also indifferent to time, though it assumes that the
+hydrograph has a constant timestep. This methods works by measuring the magitude of
+slope reversals (+/-) in the hydrograph shape.
+
+Steps:
+1. Normalizes hydrograph values to a 0-1 range
+2. Computes differences between consecutive values (assuming a constant timestep)
+3. Detects sign changes in the differences (i.e., slope reversals)
 4. Sums the magnitude of these sign changes
-5. Normalizes by the length of the hydrograph
+5. Normalizes by the length of the hydrograph (i.e., the number of values)
 
 This produces a score between 0 and 1, where:
 - 0.0 indicates perfect stability (no oscillations)
 - Higher values indicate more instability
 - Default threshold of 0.002 classifies hydrographs as stable/unstable
+
+![stable](https://raw.githubusercontent.com/fema-ffrd/hydrostab/main/docs/stable.png "Stable")
+![unstable](https://raw.githubusercontent.com/fema-ffrd/hydrostab/main/docs/unstable.png "Unstable")
+
+More examples: [notebooks/stability-examples.ipynb](notebooks/stability-examples.ipynb)
 
 ### Experimental Methods
 The following methods are experimental and not recommended for typical production use:
@@ -71,7 +76,6 @@ Install the package in editable mode:
 Install dev dependencies:
 ```
 (venv-hydrostab) $ pip install ".[dev]"
-
 ```
 
 Install dependencies for notebooks (note that we're using 
@@ -90,11 +94,6 @@ With the virtual environment activated, run the tests:
 ```
 (venv-hydrostab) $ pytest
 ```
-
-## Included Methods
-* Slope Change Aggregation (default/recommended)
-* Abrupt Change Detection
-* Normalized First Derivative 
 
 ## Usage
 ### Single Hydrograph
