@@ -15,6 +15,7 @@ concurrency:
 
 jobs:
   build:
+    name: Lint and test
 
     strategy:
       matrix:

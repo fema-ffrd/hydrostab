@@ -78,9 +78,7 @@ Install dev dependencies:
 (venv-hydrostab) $ pip install ".[dev]"
 ```
 
-Install dependencies for notebooks (note that we're using 
-[jupytext](https://jupytext.readthedocs.io/en/latest/) 
-to sync notebooks as Markdown documents):
+Install dependencies for notebooks:
 ```
 (venv-hydrostab) $ pip install ".[nb]"
 ```
