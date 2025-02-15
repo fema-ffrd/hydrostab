@@ -3,7 +3,6 @@
 import numpy as np
 import numpy.typing as npt
 import pandas as pd
-import scipy.signal
 
 from typing import Tuple
 
@@ -54,6 +53,8 @@ def fft_stability(
         Frequencies of the power spectrum.
 
     """
+    import scipy.signal
+
     if detrend:
         hydrograph = scipy.signal.detrend(hydrograph, type="constant")
     if standardize:

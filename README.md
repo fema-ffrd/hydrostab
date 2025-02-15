@@ -19,6 +19,16 @@ To install from PyPI:
 pip install hydrostab
 ```
 
+To install with dependencies for analyzing HEC-RAS model data (`rashdf`):
+```
+pip install "hydrostab[ras]"
+```
+
+To install with dependencies for experimental methods:
+```
+pip install "hydrostab[exp]"
+```
+
 ## Methods
 
 ### Slope Change Aggregation

@@ -13,11 +13,12 @@ classifiers = [
     "Programming Language :: Python :: 3.12",
 ]
 version = "0.1.0"
-dependencies = ["pandas", "scipy"]
+dependencies = ["pandas"]
 
 [project.optional-dependencies]
-dev = ["pre-commit", "ruff", "pytest", "pytest-cov"]
 ras = ["rashdf"]
+exp = ["scipy"]
+dev = ["pre-commit", "ruff", "pytest", "pytest-cov"]
 nb = ["jupyterlab", "jupytext", "ipywidgets", "matplotlib", "rashdf"]
 # docs = ["sphinx", "numpydoc", "sphinx_rtd_theme"]
 
