@@ -238,9 +238,7 @@ def _find_first_peak(flow: npt.NDArray[np.float64]) -> int:
 
 
 def abrupt_changes(
-    hydrograph_values: npt.ArrayLike, 
-    percent_change: float, 
-    max_time_interval: int
+    hydrograph_values: npt.ArrayLike, percent_change: float, max_time_interval: int
 ) -> bool:
     """Detect abrupt changes in a time series hydrograph.
 

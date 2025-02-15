@@ -11,12 +11,12 @@ import hydrostab
 
 def _reformat_var_name(var_name: str) -> str:
     """Reformat variable name for Pandas DataFrame.
-    
+
     Parameters
     ----------
     var_name : str
         Variable name to reformat
-        
+
     Returns
     -------
     str
