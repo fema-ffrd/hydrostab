@@ -10,7 +10,7 @@ from hydrostab.utils import coerce_array
 
 
 def fft_stability(
-    hydrograph: np.ndarray,
+    hydrograph: npt.NDArray[np.float64],
     sampling_rate: float = 1.0,
     unstable_period: float = 10.0,
     threshold: float = 0.002,
@@ -18,44 +18,51 @@ def fft_stability(
     relative: bool = False,
     standardize: bool = False,
     detrend: bool = False,
-) -> Tuple[bool, float, np.ndarray, np.ndarray]:
-    """EXPERIMENTAL. Check if a time series hydrograph is stable using Fourier Transforms.
+) -> Tuple[bool, float, npt.NDArray[np.float64], npt.NDArray[np.float64]]:
+    """Check if a time series hydrograph is stable using Fourier Transforms.
+
+    EXPERIMENTAL: This method is still under development.
 
     Parameters
     ----------
-    hydrograph : np.ndarray
-        Time series hydrograph data.
-    sampling_rate: float, optional
-        Sampling rate of the hydrograph data. i.e., the time between each data
-        point.
+    hydrograph : npt.NDArray[np.float64]
+        Time series hydrograph data
+    sampling_rate : float, optional
+        Sampling rate of the hydrograph data (time between each point), by default 1.0
     unstable_period : float, optional
-        Time period for unstable oscillations. Oscillations happening faster
-        than this are considered problematic. Must be in the same units as
-        the sampling rate.
+        Time period threshold for unstable oscillations, by default 10.0.
+        Oscillations faster than this are considered problematic.
+        Must be in the same units as sampling_rate.
     threshold : float, optional
-        Power threshold of unstable oscillations for classifying. If the
-        stability. If the proportion of power in high-frequency components
-        exceeds this threshold, the hydrograph is considered unstable.
+        Power threshold for classifying instability, by default 0.002.
+        If the proportion of power in high-frequency components exceeds this,
+        the hydrograph is considered unstable.
     normalize : bool, optional
-        Normalize hydrograph data to the range [0, 1].
+        Normalize data to [0, 1] range, by default False
     relative : bool, optional
-        Adjust hydrograph data relative to the minimum value.
+        Adjust data relative to minimum value, by default False
     standardize : bool, optional
-        Standardize hydrograph data to have zero mean and unit variance.
+        Standardize data to zero mean and unit variance, by default False
     detrend : bool, optional
-        Remove the mean from the hydrograph data.
+        Remove the mean from the data, by default False
 
     Returns
     -------
-    is_unstable: bool
-        True if the time series is unstable, False otherwise.
-    high_freq_proportion: float
-        Proportion of power in high-frequency components.
-    power_spectrum: np.ndarray
-        Power spectrum of the hydrograph data.
-    freqs: np.ndarray
-        Frequencies of the power spectrum.
+    is_unstable : bool
+        True if the time series is unstable, False otherwise
+    high_freq_proportion : float
+        Proportion of power in high-frequency components
+    power_spectrum : npt.NDArray[np.float64]
+        Power spectrum of the hydrograph data
+    freqs : npt.NDArray[np.float64]
+        Frequencies of the power spectrum
 
+    Raises
+    ------
+    ValueError
+        If input array has less than 2 points or contains invalid values
+    ImportError
+        If scipy is not installed
     """
     import scipy.signal
 
@@ -120,18 +127,35 @@ def oscillation_fraction(
     hydrograph_values: npt.ArrayLike,
     hydrograph_times: npt.ArrayLike,
     rate_of_change_threshold: float,
-):
-    """
-    EXPERIMENTAL. Calculate the oscillation fraction from the hydrograph data.
+) -> tuple[float, npt.NDArray[np.float64], float, float]:
+    """Calculate the oscillation fraction from the hydrograph data.
+
+    EXPERIMENTAL: This method is still under development.
 
     Parameters
     ----------
-    file_path (str): The path to the CSV file containing the hydrograph data.
-    rate_of_change_threshold (float): The threshold for the rate of change to consider an oscillation.
+    hydrograph_values : npt.ArrayLike
+        Array of hydrograph values (flow or stage)
+    hydrograph_times : npt.ArrayLike
+        Array of datetime values corresponding to hydrograph_values
+    rate_of_change_threshold : float
+        Threshold for the rate of change to consider an oscillation
 
     Returns
     -------
-    tuple: A tuple containing the oscillation fraction, flow data, rate of change percentage, time data, standard deviation, and inferred time interval in minutes.
+    oscillation_fraction : float
+        Fraction of points that exceed the rate of change threshold
+    rate_of_change_percentage : npt.NDArray[np.float64]
+        Percentage rate of change at each point
+    std_dev_rate_of_change : float
+        Standard deviation of the rate of change percentage
+    time_interval_minutes : float
+        Inferred time interval between measurements in minutes
+
+    Raises
+    ------
+    ValueError
+        If input arrays have different lengths or contain invalid values
     """
     hyd_values = coerce_array(hydrograph_values)
     hyd_times = _coerce_dt_array(hydrograph_times)
@@ -184,18 +208,18 @@ def oscillation_fraction(
     )
 
 
-def _find_first_peak(flow: np.ndarray):
-    """
-    Find the first peak data point in a data array.
+def _find_first_peak(flow: npt.NDArray[np.float64]) -> int:
+    """Find the first peak data point in a data array.
 
     Parameters
     ----------
-    flow : np.ndarray
+    flow : npt.NDArray[np.float64]
         Array of hydrograph data (flow or stage)
 
     Returns
     -------
-        A integer showing the location of the first peak data point in the input array
+    int
+        Index location of the first peak data point in the input array
     """
     # Set the initial maximum flow to be 0
     max = 0
@@ -214,24 +238,32 @@ def _find_first_peak(flow: np.ndarray):
 
 
 def abrupt_changes(
-    hydrograph_values: npt.ArrayLike, percent_change: float, max_time_interval: int
-):
-    """
-    EXPERIMENTAL. Detect abrupt changes in a time series hydrograph data based on the specified parameters.
+    hydrograph_values: npt.ArrayLike, 
+    percent_change: float, 
+    max_time_interval: int
+) -> bool:
+    """Detect abrupt changes in a time series hydrograph.
+
+    EXPERIMENTAL: This method is still under development.
 
     Parameters
     ----------
-    hydrograph_values : np.ndarray
+    hydrograph_values : npt.ArrayLike
         Array of hydrograph data (flow or stage)
     percent_change : float
-        The minimum percentage change in the hydrograph flow data range that is considered an abrupt change.
+        Minimum percentage change in the hydrograph range to be considered an abrupt change
     max_time_interval : int
-        The maximum interval in samples between two data points to be considered part of the same change.
+        Maximum number of samples between points to be considered part of the same change
 
     Returns
     -------
     bool
-        True if the hydrograph is classified as stable, False otherwise.
+        True if the hydrograph is classified as stable, False otherwise
+
+    Raises
+    ------
+    ValueError
+        If input array has less than 2 points or contains invalid values
     """
     # Find location of the first peak
     first_peak_index = _find_first_peak(hydrograph_values)
