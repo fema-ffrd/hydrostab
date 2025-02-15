@@ -40,6 +40,10 @@ def fft_stability(
         Normalize hydrograph data to the range [0, 1].
     relative : bool, optional
         Adjust hydrograph data relative to the minimum value.
+    standardize : bool, optional
+        Standardize hydrograph data to have zero mean and unit variance.
+    detrend : bool, optional
+        Remove the mean from the hydrograph data.
 
     Returns
     -------
@@ -221,7 +225,7 @@ def abrupt_changes(
         Array of hydrograph data (flow or stage)
     percent_change : float
         The minimum percentage change in the hydrograph flow data range that is considered an abrupt change.
-    change_interval : int
+    max_time_interval : int
         The maximum interval in samples between two data points to be considered part of the same change.
 
     Returns
