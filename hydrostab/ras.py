@@ -106,6 +106,45 @@ def reflines_stability(
     return ds_reflines
 
 
+def refpoints_stability(
+    plan_hdf: RasPlanHdf,
+    unstable_threshold: float = 0.002,
+    range_threshold: float = 0.1,
+    gdf: bool = False,
+) -> Union[xr.Dataset, gpd.GeoDataFrame]:
+    """Calculate stability metrics for reference points.
+
+    Parameters
+    ----------
+    plan_hdf : RasPlanHdf
+        HEC-RAS plan HDF file object
+    unstable_threshold : float, optional
+        Threshold above which a stability score indicates instability, by default 0.002
+    range_threshold : float, optional
+        Threshold for range normalization in stability calculation, by default 0.1
+    gdf : bool, optional
+        Return results as GeoDataFrame if True, by default False
+
+    Returns
+    -------
+    Union[xr.Dataset, gpd.GeoDataFrame]
+        Dataset or GeoDataFrame containing stability metrics
+    """
+    ds_refpoints = plan_hdf.reference_points_timeseries_output()
+    ds_refpoints, stability_vars = _calculate_stability(
+        ds_refpoints, ["Flow", "Water Surface"], unstable_threshold, range_threshold
+    )
+
+    if gdf:
+        gdf_refpoints = plan_hdf.reference_points()
+        for stabvar in stability_vars:
+            gdf_refpoints[_reformat_var_name(stabvar)] = ds_refpoints[
+                stabvar
+            ].to_series()
+        return gdf_refpoints
+    return ds_refpoints
+
+
 def mesh_cells_stability(
     plan_hdf: RasPlanHdf,
     mesh_name: str,
